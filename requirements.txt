@@ -1,0 +1,8 @@
+bleak
+bluepy
+mido
+nanoleafapi
+numpy
+opencv-python
+python-dotenv
+python-rtmidi

@@ -1,0 +1,7 @@
+# created by virtualenv automatically
+*
+.env
+!.gitignore
+!*.py
+!requirements.txt
+!*.sample
