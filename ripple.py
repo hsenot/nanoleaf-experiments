@@ -21,7 +21,9 @@ NL_UDP_PORT = int(os.getenv("NANOLEAF_UDP_PORT", 60222))
 nl = get_nanoleaf_object()
 layout = nl.get_layout()
 print(layout)
-panels = [p for p in layout['positionData'] if p['panelId'] not in (7824,25891,35132)]
+panels = [p for p in layout['positionData'] if p['panelId'] 
+# not in (7824,25891,35132)
+]
 
 # This starts the UDP extcontrol mode
 nl.enable_extcontrol()

@@ -6,3 +6,5 @@ numpy
 opencv-python
 python-dotenv
 python-rtmidi
+scipy
+sounddevice
