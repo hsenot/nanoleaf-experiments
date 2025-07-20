@@ -4,6 +4,7 @@ mido
 nanoleafapi
 numpy
 opencv-python
+pillow
 python-dotenv
 python-rtmidi
 scipy
