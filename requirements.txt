@@ -5,6 +5,7 @@ nanoleafapi
 numpy
 opencv-python
 pillow
+pynput
 python-dotenv
 python-rtmidi
 scipy

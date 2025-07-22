@@ -2,7 +2,6 @@ import os
 import socket
 from pathlib import Path
 from random import randint
-from time import sleep
 
 import mido
 from dotenv import load_dotenv
@@ -28,36 +27,6 @@ panel_ids = [i for i in nl.get_ids() if i!=0]
 print(panel_ids)
 n_panels = len(panel_ids)
 n_panels_b = n_panels.to_bytes(2, "big")
-
-
-def test_udp():
-    nanoleaf_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
-    while True:
-
-        send_data = b""
-        send_data += n_panels_b
-        transition = 10
-
-        for panel_id in panel_ids:
-            if panel_id != 0:
-                panel_id_b = panel_id.to_bytes(2, "big")
-                send_data += panel_id_b
-                red = randint(40, 255)
-                send_data += red.to_bytes(1, "big")
-                green = randint(40, 255)
-                send_data += green.to_bytes(1, "big")
-                blue =randint(40, 255)
-                send_data += blue.to_bytes(1, "big")
-                white = randint(0, 0)
-                send_data += white.to_bytes(1, "big")
-                send_data += transition.to_bytes(2, "big")
-
-        print(send_data)
-
-        nanoleaf_socket.sendto(send_data, (NL_IP, NL_UDP_PORT))
-        sleep(1)
-
-    nanoleaf_socket.close()
 
 
 def map_key_to_panel(key):
@@ -90,7 +59,7 @@ for port in mido.get_input_names():
     print(port)
 
 # Listen to MIDI
-with mido.open_input('Launchkey Mini MK3:Launchkey Mini MK3 Launchkey Mi 16:0') as port:
+with mido.open_input('Launchkey Mini MK3:Launchkey Mini MK3 Launchkey Mi 24:0') as port:
     nanoleaf_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
     while True:
         msg = port.receive()
