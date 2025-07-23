@@ -65,7 +65,7 @@ letter_map = {
     "O": [(1,0), (0,1), (2,1), (0,2), (2,2), (0,3), (2,3), (1,4)],
     "P": [(0,0), (1,0), (0,1), (2,1), (0,2), (1,2), (0,3), (0,4)],
     "Q": [(1,0), (0,1), (2,1), (0,2), (2,2), (1,3), (2,3), (0,4), (2,4)],
-    "R": [(0,0), (1,0), (0,1), (2,1), (0,2), (1,2), (0,3), (1,3), (2,3), (0,4), (2,4)],
+    "R": [(0,0), (1,0), (0,1), (2,1), (0,2), (1,2), (0,3), (2,3), (0,4), (2,4)],
     "S": [(1,0), (2,0), (0,1), (1,2), (2,2), (2,3), (0,4), (1,4)],
     "T": [(0,0), (1,0), (2,0), (1,1), (1,2), (1,3), (1,4)],
     "U": [(0,0), (2,0), (0,1), (2,1), (0,2), (2,2), (0,3), (2,3), (1,4)],
@@ -76,27 +76,29 @@ letter_map = {
     "Z": [(0,0), (1,0), (2,0), (2,1), (1,2), (0,3), (0,4), (1,4), (2,4)],
 
     # Digits 0–9
-    "0": [(1,0), (0,1), (2,1), (0,2), (2,2), (0,3), (2,3), (1,4)],
+    "0": [(0, 0), (1,0), (2,0), (0,1), (2,1), (0,2), (2,2), (0,3), (2,3), (0,4), (1,4), (2,4)],
     "1": [(1,0), (1,1), (1,2), (1,3), (1,4)],
-    "2": [(1,0), (2,0), (2,1), (1,2), (0,3), (0,4), (1,4), (2,4)],
-    "3": [(1,0), (2,0), (2,1), (1,2), (2,2), (2,3), (1,4)],
-    "4": [(2,0), (0,1), (2,1), (1,2), (2,2), (2,3), (2,4)],
-    "5": [(0,0), (1,0), (2,0), (0,1), (1,1), (2,2), (2,3), (0,4), (1,4)],
-    "6": [(1,0), (0,1), (0,2), (1,2), (2,2), (0,3), (2,3), (1,4)],
+    "2": [(0,0), (1,0), (2,1), (1,2), (0,3), (0,4), (1,4), (2,4)],
+    "3": [(0,0), (1,0), (2,1), (1,2), (2,2), (2,3), (0,4), (1,4)],
+    "4": [(0,0), (0,1), (2,1), (0,2), (1,2), (2,2), (2,3), (2,4)],
+    "5": [(0,0), (1,0), (2,0), (0,1), (0,2), (1,2), (2,3), (0,4), (1,4)],
+    "6": [(1,0), (2,0), (0,1), (0,2), (1,2), (2,2), (0,3), (2,3), (1,4)],
     "7": [(0,0), (1,0), (2,0), (2,1), (1,2), (1,3), (1,4)],
-    "8": [(1,0), (0,1), (2,1), (1,2), (0,3), (2,3), (1,4)],
-    "9": [(1,0), (0,1), (2,1), (1,2), (2,2), (2,3), (1,4)],
+    "8": [(0,0), (1,0), (2,0), (0,1), (2,1), (0,2),(1,2),(2, 2), (0,3), (2,3), (0,4), (1,4), (2,4)],
+    "9": [(1,0), (0,1), (2,1), (1,2), (2,2), (2,3), (0,4), (1,4)],
 }
 
 
 def on_press(key):
-    send_colors_to_panels(sock, all_panel_ids, [0,0,0], transition=0)
+    
     try:
         k = key.char.upper()
         if k in letter_map and k not in active_keys:
-            panel_ids = [grid_to_panel[pos] for pos in letter_map[k]]
-            send_colors_to_panels(sock, panel_ids, [randint(40, 255),randint(40, 255),randint(40, 255)], transition=2)
             active_keys.add(k)
+            # resetting the panels briefly to avoid blended letters when typing fast
+            send_colors_to_panels(sock, all_panel_ids, [0,0,0], transition=0)
+            panel_ids = [grid_to_panel[pos] for pos in letter_map[k]]
+            send_colors_to_panels(sock, panel_ids, [randint(40, 255),randint(40, 255),randint(40, 255)], transition=1)
     except AttributeError:
         pass  # special keys (ctrl, etc)
 
@@ -104,14 +106,12 @@ def on_release(key):
     try:
         k = key.char.upper()
         if k in letter_map and k in active_keys:
-            panel_ids = [grid_to_panel[pos] for pos in letter_map[k]]
-            send_colors_to_panels(sock, panel_ids, [0,0,0], transition=10)
             active_keys.remove(k)
+            panel_ids = [grid_to_panel[pos] for pos in letter_map[k]]
+            send_colors_to_panels(sock, panel_ids, [0,0,0], transition=16)
     except AttributeError:
         pass
 
-# Switch off all panels to start with
-send_colors_to_panels(sock, all_panel_ids, [0,0,0], transition=10)
 
 print("Listening for keys a-zfggfgfgfgfgfggfgfgfgfgfgfgffgfgfgfgfgfgfgfgfgfgffgfgfgfg and 0-9 on 3×5 grid...")
 with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
