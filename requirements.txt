@@ -10,3 +10,4 @@ python-dotenv
 python-rtmidi
 scipy
 sounddevice
+zeroconf

@@ -75,7 +75,7 @@ letter_map = {
     "Y": [(0,0), (2,0), (1,1), (1,2), (1,3), (1,4)],
     "Z": [(0,0), (1,0), (2,0), (2,1), (1,2), (0,3), (0,4), (1,4), (2,4)],
 
-    # Digits 0–9
+    # Digits 0–9 - blockier fonts 
     "0": [(0, 0), (1,0), (2,0), (0,1), (2,1), (0,2), (2,2), (0,3), (2,3), (0,4), (1,4), (2,4)],
     "1": [(1,0), (1,1), (1,2), (1,3), (1,4)],
     "2": [(0,0), (1,0), (2,1), (1,2), (0,3), (0,4), (1,4), (2,4)],
@@ -86,6 +86,8 @@ letter_map = {
     "7": [(0,0), (1,0), (2,0), (2,1), (1,2), (1,3), (1,4)],
     "8": [(0,0), (1,0), (2,0), (0,1), (2,1), (0,2),(1,2),(2, 2), (0,3), (2,3), (0,4), (1,4), (2,4)],
     "9": [(1,0), (0,1), (2,1), (1,2), (2,2), (2,3), (0,4), (1,4)],
+
+    "!": [(1,0), (1,1), (1,2), (1,4)]
 }
 
 
@@ -113,7 +115,7 @@ def on_release(key):
         pass
 
 
-print("Listening for keys a-zfggfgfgfgfgfggfgfgfgfgfgfgffgfgfgfgfgfgfgfgfgfgffgfgfgfg and 0-9 on 3×5 grid...")
+print("Listening for keys a-z and 0-9 on 3×5 grid...")
 with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
     listener.join()
 

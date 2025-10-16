@@ -1,15 +1,47 @@
 import os
+import time
 from pathlib import Path
 
 from dotenv import load_dotenv
 from nanoleafapi import Nanoleaf
+from zeroconf import ServiceBrowser, Zeroconf
 
 # Automatically load .env from the same folder as this utils.py file
 dotenv_path = Path(__file__).resolve().parent / '.env'
 load_dotenv(dotenv_path)
 
+
+class NanoleafListener:
+    def __init__(self):
+        self.devices = []
+
+    def add_service(self, zeroconf, service_type, name):
+        info = zeroconf.get_service_info(service_type, name)
+        if info and 'nanoleaf' in name.lower():
+            ip = ".".join(map(str, info.addresses[0]))
+            print(f"Found Nanoleaf: {name} at {ip}")
+            self.devices.append({'name': name, 'ip': ip})
+
+    def update_service(self, zeroconf, service_type, name):
+        # Required by Zeroconf >= 0.39 — safe to leave empty
+        pass
+
+
 def get_nanoleaf_credentials():
-    ip = os.getenv("NANOLEAF_IP")
+    zeroconf = Zeroconf()
+    listener = NanoleafListener()
+    browser = ServiceBrowser(zeroconf, "_nanoleafapi._tcp.local.", listener)
+    time.sleep(2)  # Give time for discovery
+    zeroconf.close()
+
+    # auto-detect IP, fallback on env file
+    if listener.devices:
+        ip = listener.devices[0]['ip']
+        print(f"IP from auto-detect: {ip}")
+    else:
+        ip = os.getenv("NANOLEAF_IP")
+        print(f"IP from .end file: {ip}")
+
     token = os.getenv("NANOLEAF_TOKEN")
     if not ip or not token:
         raise ValueError("Missing NANOLEAF_IP or NANOLEAF_TOKEN in .env file")
@@ -19,6 +51,8 @@ def get_nanoleaf_credentials():
 def get_nanoleaf_object():
     ip, token = get_nanoleaf_credentials()
     nl = Nanoleaf(ip, token)
+    # clear any existing color
+    nl.set_color((0,0,0))
     return nl
 
 

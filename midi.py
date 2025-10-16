@@ -31,6 +31,7 @@ n_panels_b = n_panels.to_bytes(2, "big")
 
 def map_key_to_panel(key):
     return panel_ids[key % n_panels]
+    #return panel_ids[randint(0,n_panels - 1)]
 
 def send_color_to_panel(sock, p_id, rgb, transition=10):
     send_data = b""
@@ -38,12 +39,7 @@ def send_color_to_panel(sock, p_id, rgb, transition=10):
     white = 0
     send_data += one_panel.to_bytes(2, "big")
 
-    if not rgb:
-        red = randint(40, 255)
-        green = randint(40, 255)
-        blue = randint(40, 255)
-    else:
-        red, green, blue = rgb
+    red, green, blue = rgb
 
     send_data += p_id.to_bytes(2, "big")
     send_data += red.to_bytes(1, "big")
@@ -54,19 +50,18 @@ def send_color_to_panel(sock, p_id, rgb, transition=10):
     sock.sendto(send_data, (NL_IP, NL_UDP_PORT))
 
 # This seems to change from session to session ..
-print("Available MIDI input ports:")
-for port in mido.get_input_names():
-    print(port)
+midi_port = next(port for port in mido.get_input_names() if 'Launchkey Mini MK3 MIDI' in port)
 
 # Listen to MIDI
-with mido.open_input('Launchkey Mini MK3:Launchkey Mini MK3 Launchkey Mi 24:0') as port:
+with mido.open_input(midi_port) as port:
     nanoleaf_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
     while True:
         msg = port.receive()
         if msg.type == 'note_on' and msg.velocity > 0:
             print(msg)
-            send_color_to_panel(nanoleaf_socket, map_key_to_panel(int(msg.note)), None, 1)
+            rgb = (randint(127, 255), randint(127, 255), randint(127, 255))
+            send_color_to_panel(nanoleaf_socket, map_key_to_panel(int(msg.note)), rgb, 1)
         elif msg.type in ('note_off', 'note_on') and msg.velocity == 0:
-            send_color_to_panel(nanoleaf_socket, map_key_to_panel(int(msg.note)), (0,0,0), 25)
+            send_color_to_panel(nanoleaf_socket, map_key_to_panel(int(msg.note)), (0,0,0), 20)
 
     nanoleaf_socket.close()
